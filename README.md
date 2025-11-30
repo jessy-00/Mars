@@ -1,4 +1,4 @@
-[Uploading index.html…]()
+[index.html](https://github.com/user-attachments/files/23840602/index.html)
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -87,6 +87,12 @@
             margin-bottom: 15px;
         }
         
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
         input {
             flex: 1;
             padding: 12px 15px;
@@ -101,6 +107,10 @@
         input:focus {
             outline: none;
             border-color: #2575fc;
+        }
+        
+        .time-input {
+            max-width: 120px;
         }
         
         button {
@@ -217,6 +227,13 @@
             font-family: 'Courier New', monospace;
         }
         
+        .planned-time {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
         .task-footer {
             display: flex;
             justify-content: space-between;
@@ -260,6 +277,12 @@
             font-size: 0.85rem;
             color: #666;
             line-height: 1.4;
+        }
+        
+        .overtime {
+            color: #f44336;
+            font-weight: bold;
+            margin-top: 5px;
         }
         
         .date-time {
@@ -309,6 +332,14 @@
             
             .input-group {
                 flex-direction: column;
+            }
+            
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .time-input {
+                max-width: 100%;
             }
             
             button {
@@ -394,8 +425,11 @@
         </header>
         
         <div class="input-section">
-            <div class="input-group">
+            <div class="input-row">
                 <input type="text" id="seatInput" placeholder="请输入座位号" autocomplete="off">
+                <input type="number" id="plannedMinutes" class="time-input" placeholder="计划分钟数" min="1" max="480" autocomplete="off">
+            </div>
+            <div class="input-group">
                 <button id="startBtn">开始计时</button>
             </div>
         </div>
@@ -447,6 +481,12 @@
                 }
             });
             
+            document.getElementById('plannedMinutes').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startNewTask();
+                }
+            });
+            
             // 每秒更新所有计时器
             setInterval(updateAllTimers, 1000);
             
@@ -474,10 +514,17 @@
         // 开始新任务
         function startNewTask() {
             const seatInput = document.getElementById('seatInput');
+            const plannedMinutesInput = document.getElementById('plannedMinutes');
             const seatNumber = seatInput.value.trim();
+            const plannedMinutes = parseInt(plannedMinutesInput.value);
             
             if (!seatNumber) {
                 showMessage('请输入座位号！', 'warning');
+                return;
+            }
+            
+            if (!plannedMinutes || plannedMinutes < 1) {
+                showMessage('请输入有效的计划分钟数！', 'warning');
                 return;
             }
             
@@ -489,11 +536,13 @@
             const startTime = new Date();
             tasks[seatNumber] = {
                 startTime: startTime,
+                plannedMinutes: plannedMinutes,
                 element: null
             };
             
             // 清空输入框
             seatInput.value = '';
+            plannedMinutesInput.value = '';
             
             // 更新任务显示
             updateTasksDisplay();
@@ -501,7 +550,7 @@
             // 保存数据
             saveData();
             
-            showMessage(`座位 ${seatNumber} 开始计时`, 'success');
+            showMessage(`座位 ${seatNumber} 开始计时，计划时长 ${plannedMinutes} 分钟`, 'success');
         }
         
         // 结束任务
@@ -511,13 +560,17 @@
             const task = tasks[seatNumber];
             const endTime = new Date();
             const timeElapsed = endTime - task.startTime;
+            const plannedMilliseconds = task.plannedMinutes * 60 * 1000;
+            const overtime = Math.max(0, timeElapsed - plannedMilliseconds);
             
             // 添加到已完成任务列表
             completedTasks.unshift({
                 seatNumber: seatNumber,
                 startTime: new Date(task.startTime),
                 endTime: endTime,
-                timeElapsed: timeElapsed
+                timeElapsed: timeElapsed,
+                plannedMinutes: task.plannedMinutes,
+                overtime: overtime
             });
             
             // 从进行中任务中移除
@@ -530,7 +583,11 @@
             // 保存数据
             saveData();
             
-            showMessage(`座位 ${seatNumber} 计时完成`, 'info');
+            if (overtime > 0) {
+                showMessage(`座位 ${seatNumber} 计时完成，超时 ${formatTime(overtime)}`, 'info');
+            } else {
+                showMessage(`座位 ${seatNumber} 计时完成，未超时`, 'info');
+            }
         }
         
         // 删除已完成任务
@@ -555,6 +612,14 @@
                 if (timerElement) {
                     timerElement.textContent = formatTime(elapsed);
                 }
+                
+                // 检查是否超时并更新颜色
+                const plannedMilliseconds = task.plannedMinutes * 60 * 1000;
+                if (elapsed > plannedMilliseconds) {
+                    timerElement.style.color = '#f44336';
+                } else {
+                    timerElement.style.color = '#2575fc';
+                }
             }
         }
         
@@ -566,6 +631,18 @@
             const seconds = totalSeconds % 60;
             
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 格式化分钟数为可读格式
+        function formatMinutes(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            
+            if (hours > 0) {
+                return `${hours}小时${mins}分钟`;
+            } else {
+                return `${mins}分钟`;
+            }
         }
         
         // 格式化日期时间为完整格式
@@ -596,6 +673,8 @@
             for (const seatNumber in tasks) {
                 const task = tasks[seatNumber];
                 const elapsed = new Date() - task.startTime;
+                const plannedMilliseconds = task.plannedMinutes * 60 * 1000;
+                const isOvertime = elapsed > plannedMilliseconds;
                 
                 const taskElement = document.createElement('div');
                 taskElement.className = 'task-item';
@@ -603,7 +682,8 @@
                     <div class="task-header">
                         <div class="seat-number">座位 ${seatNumber}</div>
                     </div>
-                    <div class="timer" id="timer-${seatNumber}">${formatTime(elapsed)}</div>
+                    <div class="planned-time">计划时长: ${formatMinutes(task.plannedMinutes)}</div>
+                    <div class="timer" id="timer-${seatNumber}" style="color: ${isOvertime ? '#f44336' : '#2575fc'}">${formatTime(elapsed)}</div>
                     <div class="date-time">开始时间: ${formatDateTime(task.startTime)}</div>
                     <div class="task-footer">
                         <button class="btn-end" onclick="endTask('${seatNumber}')">结束计时</button>
@@ -634,15 +714,23 @@
             recentTasks.forEach((task, index) => {
                 const resultElement = document.createElement('div');
                 resultElement.className = 'result-item';
+                
+                let overtimeHtml = '';
+                if (task.overtime > 0) {
+                    overtimeHtml = `<div class="overtime">超出时长: ${formatTime(task.overtime)}</div>`;
+                }
+                
                 resultElement.innerHTML = `
                     <div class="result-header">
                         <span>座位 ${task.seatNumber}</span>
                         <button class="btn-delete" onclick="deleteCompletedTask(${index})">删除</button>
                     </div>
                     <div class="result-details">
+                        计划时长: ${formatMinutes(task.plannedMinutes)}<br>
                         开始: ${formatDateTime(task.startTime)}<br>
                         结束: ${formatDateTime(task.endTime)}<br>
                         用时: ${formatTime(task.timeElapsed)}
+                        ${overtimeHtml}
                     </div>
                 `;
                 
@@ -692,7 +780,8 @@
                 
                 for (const seatNumber in tasks) {
                     data.tasks[seatNumber] = {
-                        startTime: tasks[seatNumber].startTime.getTime()
+                        startTime: tasks[seatNumber].startTime.getTime(),
+                        plannedMinutes: tasks[seatNumber].plannedMinutes
                     };
                 }
                 
@@ -719,7 +808,8 @@
                     tasks = {};
                     for (const seatNumber in data.tasks) {
                         tasks[seatNumber] = {
-                            startTime: new Date(data.tasks[seatNumber].startTime)
+                            startTime: new Date(data.tasks[seatNumber].startTime),
+                            plannedMinutes: data.tasks[seatNumber].plannedMinutes || 60 // 默认60分钟
                         };
                     }
                     
@@ -729,7 +819,9 @@
                             seatNumber: task.seatNumber,
                             startTime: new Date(task.startTime),
                             endTime: new Date(task.endTime),
-                            timeElapsed: task.timeElapsed
+                            timeElapsed: task.timeElapsed,
+                            plannedMinutes: task.plannedMinutes || 60, // 默认60分钟
+                            overtime: task.overtime || 0
                         }));
                     }
                     
