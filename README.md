@@ -1,4 +1,4 @@
-[Uploading index.html…]()
+[index.html](https://github.com/user-attachments/files/23840261/index.html)
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -55,6 +55,7 @@
         .input-group {
             display: flex;
             margin-bottom: 10px;
+            width: 100%;
         }
         
         input {
@@ -63,6 +64,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 1rem;
+            width: 100%;
         }
         
         button {
@@ -179,6 +181,7 @@
             margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
         
         .result-details {
@@ -211,6 +214,15 @@
             .task-footer button {
                 margin-top: 10px;
             }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #startBtn {
+                margin-left: 0;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -224,7 +236,7 @@
         <div class="input-section">
             <div class="input-group">
                 <input type="text" id="seatInput" placeholder="请输入座位号">
-                <button id="startBtn" style="margin-left: 10px;">开始计时</button>
+                <button id="startBtn">开始计时</button>
             </div>
         </div>
         
