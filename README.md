@@ -1,4 +1,4 @@
-[Uploading index.html…]()
+[index.html](https://github.com/user-attachments/files/23840419/index.html)
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -19,41 +19,42 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             line-height: 1.6;
-            padding: 15px;
+            padding: 10px;
             min-height: 100vh;
         }
         
         .app-container {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
+            max-width: 100%;
         }
         
         header {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
-            padding: 25px 20px;
+            padding: 20px 15px;
             text-align: center;
             position: relative;
         }
         
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 8px;
             font-weight: 600;
         }
         
         .current-time {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.95;
             font-weight: 300;
         }
         
         .input-section {
-            padding: 20px;
+            padding: 15px;
             background: #f8f9fa;
         }
         
@@ -65,12 +66,13 @@
         
         input {
             flex: 1;
-            padding: 15px;
+            padding: 12px 15px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 1rem;
             background: white;
             transition: border-color 0.3s;
+            min-width: 0; /* 防止flex元素溢出 */
         }
         
         input:focus {
@@ -82,36 +84,48 @@
             background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 15px 25px;
+            border-radius: 10px;
+            padding: 12px 20px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            white-space: nowrap;
         }
         
         button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
         }
         
         .btn-end {
             background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
         }
         
         .btn-end:active {
-            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+        }
+        
+        .btn-delete:active {
+            box-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
         }
         
         .section {
-            padding: 20px;
+            padding: 15px;
         }
         
         .section-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
             color: #2c3e50;
             font-weight: 600;
             display: flex;
@@ -122,21 +136,21 @@
         .section-title::before {
             content: "•";
             color: #2575fc;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
         
         .task-list {
-            max-height: 40vh;
+            max-height: 35vh;
             overflow-y: auto;
         }
         
         .task-item {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 5px solid #6a11cb;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #6a11cb;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
             transition: transform 0.2s;
         }
         
@@ -148,21 +162,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .seat-number {
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #2c3e50;
         }
         
         .timer {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #2575fc;
             text-align: center;
-            margin: 15px 0;
+            margin: 12px 0;
             font-family: 'Courier New', monospace;
         }
         
@@ -170,59 +184,70 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 12px;
         }
         
         .start-time {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #666;
         }
         
         .completed-tasks {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-top: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-top: 15px;
+            max-width: 100%;
         }
         
         .result-item {
             background: #f8f9fa;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
             border-left: 4px solid #4CAF50;
+            position: relative;
         }
         
         .result-header {
             font-weight: bold;
             margin-bottom: 8px;
             color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .result-details {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #666;
-            line-height: 1.5;
+            line-height: 1.4;
+        }
+        
+        .date-time {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
         }
         
         .empty-state {
             text-align: center;
             color: #999;
-            padding: 40px 20px;
-            font-size: 1rem;
+            padding: 30px 15px;
+            font-size: 0.95rem;
         }
         
         .empty-state::before {
             content: "📝";
-            font-size: 2rem;
+            font-size: 1.8rem;
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         /* 滚动条样式 */
         .task-list::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         
         .task-list::-webkit-scrollbar-track {
@@ -242,7 +267,7 @@
         /* 响应式调整 */
         @media (max-width: 480px) {
             body {
-                padding: 10px;
+                padding: 8px;
             }
             
             .input-group {
@@ -255,21 +280,61 @@
             
             .task-footer {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
             
             .task-footer button {
                 width: 100%;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .timer {
+                font-size: 1.4rem;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            header {
+                padding: 15px 10px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .current-time {
+                font-size: 0.9rem;
+            }
+            
+            .input-section, .section {
+                padding: 12px;
+            }
+            
+            .task-item, .result-item {
+                padding: 12px;
+            }
+            
+            .timer {
+                font-size: 1.3rem;
             }
         }
 
         /* 加载动画 */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -342,8 +407,9 @@
         // 更新当前时间
         function updateCurrentTime() {
             const now = new Date();
+            const dateString = now.toLocaleDateString('zh-CN');
             const timeString = now.toLocaleTimeString('zh-CN');
-            document.getElementById('currentTime').textContent = timeString;
+            document.getElementById('currentTime').textContent = `${dateString} ${timeString}`;
         }
         
         // 开始新任务
@@ -408,6 +474,16 @@
             showMessage(`座位 ${seatNumber} 计时完成`, 'info');
         }
         
+        // 删除已完成任务
+        function deleteCompletedTask(index) {
+            if (index >= 0 && index < completedTasks.length) {
+                completedTasks.splice(index, 1);
+                updateCompletedTasksDisplay();
+                saveData();
+                showMessage('任务已删除', 'info');
+            }
+        }
+        
         // 更新所有计时器显示
         function updateAllTimers() {
             const now = new Date();
@@ -433,6 +509,18 @@
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
+        // 格式化日期时间为完整格式
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        
         // 更新进行中任务显示
         function updateTasksDisplay() {
             const activeTasksContainer = document.getElementById('activeTasks');
@@ -455,8 +543,8 @@
                         <div class="seat-number">座位 ${seatNumber}</div>
                     </div>
                     <div class="timer" id="timer-${seatNumber}">${formatTime(elapsed)}</div>
+                    <div class="date-time">开始时间: ${formatDateTime(task.startTime)}</div>
                     <div class="task-footer">
-                        <div class="start-time">开始: ${task.startTime.toLocaleTimeString('zh-CN')}</div>
                         <button class="btn-end" onclick="endTask('${seatNumber}')">结束计时</button>
                     </div>
                 `;
@@ -480,14 +568,17 @@
             // 只显示最近10个已完成任务
             const recentTasks = completedTasks.slice(0, 10);
             
-            recentTasks.forEach(task => {
+            recentTasks.forEach((task, index) => {
                 const resultElement = document.createElement('div');
                 resultElement.className = 'result-item';
                 resultElement.innerHTML = `
-                    <div class="result-header">座位 ${task.seatNumber}</div>
+                    <div class="result-header">
+                        <span>座位 ${task.seatNumber}</span>
+                        <button class="btn-delete" onclick="deleteCompletedTask(${index})">删除</button>
+                    </div>
                     <div class="result-details">
-                        开始: ${task.startTime.toLocaleTimeString('zh-CN')}<br>
-                        结束: ${task.endTime.toLocaleTimeString('zh-CN')}<br>
+                        开始: ${formatDateTime(task.startTime)}<br>
+                        结束: ${formatDateTime(task.endTime)}<br>
                         用时: ${formatTime(task.timeElapsed)}
                     </div>
                 `;
@@ -563,6 +654,7 @@
         
         // 全局函数，供HTML调用
         window.endTask = endTask;
+        window.deleteCompletedTask = deleteCompletedTask;
     </script>
 </body>
 </html>
