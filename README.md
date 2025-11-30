@@ -1,10 +1,10 @@
-[index.html](https://github.com/user-attachments/files/23840419/index.html)
+[Uploading index.html…]()
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>多任务时长计算器</title>
+    <title>多设备同步时长计算器</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>">
     <style>
         * {
@@ -53,6 +53,29 @@
             font-weight: 300;
         }
         
+        .sync-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
         .input-section {
             padding: 15px;
             background: #f8f9fa;
@@ -72,7 +95,7 @@
             font-size: 1rem;
             background: white;
             transition: border-color 0.3s;
-            min-width: 0; /* 防止flex元素溢出 */
+            min-width: 0;
         }
         
         input:focus {
@@ -130,13 +153,27 @@
             font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title-text {
+            display: flex;
+            align-items: center;
             gap: 8px;
         }
         
-        .section-title::before {
+        .section-title-text::before {
             content: "•";
             color: #2575fc;
             font-size: 1.3rem;
+        }
+        
+        .task-count {
+            font-size: 0.9rem;
+            color: #666;
+            background: #f1f3f4;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
         
         .task-list {
@@ -348,8 +385,12 @@
 <body>
     <div class="app-container">
         <header>
-            <h1>⏱️ 多任务时长计算器</h1>
+            <h1>⏱️ 多设备同步时长计算器</h1>
             <div class="current-time" id="currentTime">--:--:--</div>
+            <div class="sync-status">
+                <div class="sync-indicator"></div>
+                <span id="syncStatus">数据已同步</span>
+            </div>
         </header>
         
         <div class="input-section">
@@ -360,7 +401,10 @@
         </div>
         
         <div class="section">
-            <h2 class="section-title">进行中的任务</h2>
+            <h2 class="section-title">
+                <span class="section-title-text">进行中的任务</span>
+                <span class="task-count" id="activeTaskCount">0</span>
+            </h2>
             <div class="task-list" id="activeTasks">
                 <div class="empty-state">暂无进行中的任务<br>点击上方开始新任务</div>
             </div>
@@ -368,7 +412,10 @@
     </div>
     
     <div class="completed-tasks">
-        <h2 class="section-title">已完成的任务</h2>
+        <h2 class="section-title">
+            <span class="section-title-text">已完成的任务</span>
+            <span class="task-count" id="completedTaskCount">0</span>
+        </h2>
         <div id="completedTasks">
             <div class="empty-state">暂无已完成的任务</div>
         </div>
@@ -378,6 +425,8 @@
         // 存储所有任务
         let tasks = {};
         let completedTasks = [];
+        let lastSyncTime = Date.now();
+        let syncInterval;
         
         // DOM 加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -400,6 +449,16 @@
             
             // 每秒更新所有计时器
             setInterval(updateAllTimers, 1000);
+            
+            // 设置数据同步检查
+            syncInterval = setInterval(checkDataSync, 5000);
+            
+            // 监听页面可见性变化，当页面重新激活时检查数据同步
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    checkDataSync();
+                }
+            });
             
             console.log('应用初始化完成');
         });
@@ -524,8 +583,10 @@
         // 更新进行中任务显示
         function updateTasksDisplay() {
             const activeTasksContainer = document.getElementById('activeTasks');
+            const activeTaskCount = Object.keys(tasks).length;
+            document.getElementById('activeTaskCount').textContent = activeTaskCount;
             
-            if (Object.keys(tasks).length === 0) {
+            if (activeTaskCount === 0) {
                 activeTasksContainer.innerHTML = '<div class="empty-state">暂无进行中的任务<br>点击上方开始新任务</div>';
                 return;
             }
@@ -557,8 +618,10 @@
         // 更新已完成任务显示
         function updateCompletedTasksDisplay() {
             const completedTasksContainer = document.getElementById('completedTasks');
+            const completedTaskCount = completedTasks.length;
+            document.getElementById('completedTaskCount').textContent = completedTaskCount;
             
-            if (completedTasks.length === 0) {
+            if (completedTaskCount === 0) {
                 completedTasksContainer.innerHTML = '<div class="empty-state">暂无已完成的任务</div>';
                 return;
             }
@@ -587,6 +650,28 @@
             });
         }
         
+        // 检查数据同步
+        function checkDataSync() {
+            const lastSavedData = localStorage.getItem('timeTrackerLastSaved');
+            
+            if (lastSavedData && parseInt(lastSavedData) > lastSyncTime) {
+                console.log('检测到数据更新，重新加载数据');
+                loadData();
+                updateSyncStatus('数据已同步', '#4CAF50');
+            } else {
+                updateSyncStatus('数据已同步', '#4CAF50');
+            }
+        }
+        
+        // 更新同步状态显示
+        function updateSyncStatus(message, color) {
+            const syncStatus = document.getElementById('syncStatus');
+            const syncIndicator = document.querySelector('.sync-indicator');
+            
+            syncStatus.textContent = message;
+            syncIndicator.style.backgroundColor = color;
+        }
+        
         // 显示消息提示
         function showMessage(message, type = 'info') {
             // 简单的消息提示实现
@@ -612,8 +697,13 @@
                 }
                 
                 localStorage.setItem('timeTrackerData', JSON.stringify(data));
+                localStorage.setItem('timeTrackerLastSaved', Date.now().toString());
+                lastSyncTime = Date.now();
+                
+                updateSyncStatus('数据已保存', '#4CAF50');
             } catch (error) {
                 console.error('保存数据失败:', error);
+                updateSyncStatus('保存失败', '#f44336');
             }
         }
         
@@ -646,9 +736,12 @@
                     // 更新显示
                     updateTasksDisplay();
                     updateCompletedTasksDisplay();
+                    
+                    updateSyncStatus('数据已加载', '#4CAF50');
                 }
             } catch (error) {
                 console.error('加载数据失败:', error);
+                updateSyncStatus('加载失败', '#f44336');
             }
         }
         
