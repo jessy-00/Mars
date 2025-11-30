@@ -1,157 +1,176 @@
-[index.html](https://github.com/user-attachments/files/23840330/index.html)
+[Uploading index.html…]()
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>增强版时长计算器</title>
+    <title>多任务时长计算器</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>">
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             line-height: 1.6;
-            padding: 10px;
-            max-width: 500px;
-            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
         }
         
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .app-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             margin-bottom: 20px;
+            position: relative;
         }
         
         header {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
+            position: relative;
         }
         
         h1 {
             font-size: 1.5rem;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
         
         .current-time {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
         }
         
         .input-section {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 20px;
+            background: #f8f9fa;
         }
         
         .input-group {
             display: flex;
-            margin-bottom: 10px;
-            width: 100%;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         
         input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             font-size: 1rem;
-            width: 100%;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2575fc;
         }
         
         button {
-            background-color: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
+            border-radius: 12px;
+            padding: 15px 25px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
         
-        button:hover {
-            background-color: #45a049;
-        }
-        
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
         }
         
         .btn-end {
-            background-color: #f44336;
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
         }
         
-        .btn-end:hover {
-            background-color: #d32f2f;
+        .btn-end:active {
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
         }
         
-        .btn-delete {
-            background-color: #ff9800;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-        
-        .btn-delete:hover {
-            background-color: #f57c00;
-        }
-        
-        .tasks-section {
-            padding: 15px;
+        .section {
+            padding: 20px;
         }
         
         .section-title {
             font-size: 1.2rem;
             margin-bottom: 15px;
-            color: #333;
+            color: #2c3e50;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: "•";
+            color: #2575fc;
+            font-size: 1.5rem;
         }
         
         .task-list {
-            max-height: 300px;
+            max-height: 40vh;
             overflow-y: auto;
         }
         
         .task-item {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #6a11cb;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #6a11cb;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        
+        .task-item:active {
+            transform: scale(0.98);
         }
         
         .task-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         
         .seat-number {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            color: #2c3e50;
         }
         
         .timer {
-            font-size: 1.3rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #2575fc;
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
         }
         
         .task-footer {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            align-items: center;
+            margin-top: 15px;
         }
         
         .start-time {
@@ -160,107 +179,125 @@
         }
         
         .completed-tasks {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             margin-top: 20px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
         }
         
         .result-item {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
             border-left: 4px solid #4CAF50;
-            position: relative;
         }
         
         .result-header {
             font-weight: bold;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 8px;
+            color: #2c3e50;
         }
         
         .result-details {
             font-size: 0.9rem;
             color: #666;
-        }
-        
-        .date-time {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 5px;
+            line-height: 1.5;
         }
         
         .empty-state {
             text-align: center;
             color: #999;
-            padding: 20px;
+            padding: 40px 20px;
+            font-size: 1rem;
         }
         
-        /* 统一宽度设置 - 以已完成任务栏宽度为准 */
-        .input-section,
-        .tasks-section {
-            width: calc(100% - 30px);
-            margin: 0 auto;
+        .empty-state::before {
+            content: "📝";
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
         }
         
-        .input-group,
-        .task-item {
-            width: 100%;
+        /* 滚动条样式 */
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .task-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .task-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .task-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
         
         /* 响应式调整 */
         @media (max-width: 480px) {
             body {
-                padding: 5px;
-            }
-            
-            .task-header, .task-footer {
-                flex-direction: column;
-            }
-            
-            .task-footer button {
-                margin-top: 10px;
+                padding: 10px;
             }
             
             .input-group {
                 flex-direction: column;
             }
             
-            #startBtn {
-                margin-left: 0;
-                margin-top: 10px;
+            button {
                 width: 100%;
             }
+            
+            .task-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .task-footer button {
+                width: 100%;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <header>
-            <h1>增强版时长计算器</h1>
+            <h1>⏱️ 多任务时长计算器</h1>
             <div class="current-time" id="currentTime">--:--:--</div>
         </header>
         
         <div class="input-section">
             <div class="input-group">
-                <input type="text" id="seatInput" placeholder="请输入座位号">
+                <input type="text" id="seatInput" placeholder="请输入座位号" autocomplete="off">
                 <button id="startBtn">开始计时</button>
             </div>
         </div>
         
-        <div class="tasks-section">
+        <div class="section">
             <h2 class="section-title">进行中的任务</h2>
             <div class="task-list" id="activeTasks">
-                <!-- 动态添加的任务将显示在这里 -->
-                <div class="empty-state">暂无进行中的任务</div>
+                <div class="empty-state">暂无进行中的任务<br>点击上方开始新任务</div>
             </div>
         </div>
     </div>
@@ -268,7 +305,6 @@
     <div class="completed-tasks">
         <h2 class="section-title">已完成的任务</h2>
         <div id="completedTasks">
-            <!-- 动态添加的已完成任务将显示在这里 -->
             <div class="empty-state">暂无已完成的任务</div>
         </div>
     </div>
@@ -278,16 +314,11 @@
         let tasks = {};
         let completedTasks = [];
         
-        // 更新当前时间
-        function updateCurrentTime() {
-            const now = new Date();
-            const dateString = now.toLocaleDateString('zh-CN');
-            const timeString = now.toLocaleTimeString('zh-CN');
-            document.getElementById('currentTime').textContent = `${dateString} ${timeString}`;
-        }
-        
-        // 初始化
-        function init() {
+        // DOM 加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('应用初始化中...');
+            
+            // 更新当前时间
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
             
@@ -304,6 +335,15 @@
             
             // 每秒更新所有计时器
             setInterval(updateAllTimers, 1000);
+            
+            console.log('应用初始化完成');
+        });
+        
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN');
+            document.getElementById('currentTime').textContent = timeString;
         }
         
         // 开始新任务
@@ -312,12 +352,12 @@
             const seatNumber = seatInput.value.trim();
             
             if (!seatNumber) {
-                alert('请输入座位号！');
+                showMessage('请输入座位号！', 'warning');
                 return;
             }
             
             if (tasks[seatNumber]) {
-                alert(`座位号 ${seatNumber} 已经在计时中！`);
+                showMessage(`座位号 ${seatNumber} 已经在计时中！`, 'warning');
                 return;
             }
             
@@ -335,6 +375,8 @@
             
             // 保存数据
             saveData();
+            
+            showMessage(`座位 ${seatNumber} 开始计时`, 'success');
         }
         
         // 结束任务
@@ -348,7 +390,7 @@
             // 添加到已完成任务列表
             completedTasks.unshift({
                 seatNumber: seatNumber,
-                startTime: task.startTime,
+                startTime: new Date(task.startTime),
                 endTime: endTime,
                 timeElapsed: timeElapsed
             });
@@ -362,15 +404,8 @@
             
             // 保存数据
             saveData();
-        }
-        
-        // 删除已完成任务
-        function deleteCompletedTask(index) {
-            if (index >= 0 && index < completedTasks.length) {
-                completedTasks.splice(index, 1);
-                updateCompletedTasksDisplay();
-                saveData();
-            }
+            
+            showMessage(`座位 ${seatNumber} 计时完成`, 'info');
         }
         
         // 更新所有计时器显示
@@ -398,24 +433,12 @@
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
-        // 格式化日期时间为完整格式
-        function formatDateTime(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-            
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
-        
         // 更新进行中任务显示
         function updateTasksDisplay() {
             const activeTasksContainer = document.getElementById('activeTasks');
             
             if (Object.keys(tasks).length === 0) {
-                activeTasksContainer.innerHTML = '<div class="empty-state">暂无进行中的任务</div>';
+                activeTasksContainer.innerHTML = '<div class="empty-state">暂无进行中的任务<br>点击上方开始新任务</div>';
                 return;
             }
             
@@ -432,8 +455,8 @@
                         <div class="seat-number">座位 ${seatNumber}</div>
                     </div>
                     <div class="timer" id="timer-${seatNumber}">${formatTime(elapsed)}</div>
-                    <div class="date-time">开始时间: ${formatDateTime(task.startTime)}</div>
                     <div class="task-footer">
+                        <div class="start-time">开始: ${task.startTime.toLocaleTimeString('zh-CN')}</div>
                         <button class="btn-end" onclick="endTask('${seatNumber}')">结束计时</button>
                     </div>
                 `;
@@ -454,17 +477,17 @@
             
             completedTasksContainer.innerHTML = '';
             
-            completedTasks.forEach((task, index) => {
+            // 只显示最近10个已完成任务
+            const recentTasks = completedTasks.slice(0, 10);
+            
+            recentTasks.forEach(task => {
                 const resultElement = document.createElement('div');
                 resultElement.className = 'result-item';
                 resultElement.innerHTML = `
-                    <div class="result-header">
-                        <span>座位 ${task.seatNumber}</span>
-                        <button class="btn-delete" onclick="deleteCompletedTask(${index})">删除</button>
-                    </div>
+                    <div class="result-header">座位 ${task.seatNumber}</div>
                     <div class="result-details">
-                        开始: ${formatDateTime(task.startTime)}<br>
-                        结束: ${formatDateTime(task.endTime)}<br>
+                        开始: ${task.startTime.toLocaleTimeString('zh-CN')}<br>
+                        结束: ${task.endTime.toLocaleTimeString('zh-CN')}<br>
                         用时: ${formatTime(task.timeElapsed)}
                     </div>
                 `;
@@ -473,55 +496,73 @@
             });
         }
         
+        // 显示消息提示
+        function showMessage(message, type = 'info') {
+            // 简单的消息提示实现
+            console.log(`${type}: ${message}`);
+        }
+        
         // 保存数据到本地存储
         function saveData() {
-            const data = {
-                tasks: {},
-                completedTasks: completedTasks
-            };
-            
-            // 只保存必要的数据，不能保存函数或DOM元素
-            for (const seatNumber in tasks) {
-                data.tasks[seatNumber] = {
-                    startTime: tasks[seatNumber].startTime.getTime() // 保存时间戳
+            try {
+                const data = {
+                    tasks: {},
+                    completedTasks: completedTasks.map(task => ({
+                        ...task,
+                        startTime: task.startTime.getTime(),
+                        endTime: task.endTime.getTime()
+                    }))
                 };
+                
+                for (const seatNumber in tasks) {
+                    data.tasks[seatNumber] = {
+                        startTime: tasks[seatNumber].startTime.getTime()
+                    };
+                }
+                
+                localStorage.setItem('timeTrackerData', JSON.stringify(data));
+            } catch (error) {
+                console.error('保存数据失败:', error);
             }
-            
-            localStorage.setItem('timeTrackerData', JSON.stringify(data));
         }
         
         // 从本地存储加载数据
         function loadData() {
-            const savedData = localStorage.getItem('timeTrackerData');
-            
-            if (savedData) {
-                const data = JSON.parse(savedData);
+            try {
+                const savedData = localStorage.getItem('timeTrackerData');
                 
-                // 加载进行中任务
-                for (const seatNumber in data.tasks) {
-                    tasks[seatNumber] = {
-                        startTime: new Date(data.tasks[seatNumber].startTime)
-                    };
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // 加载进行中任务
+                    tasks = {};
+                    for (const seatNumber in data.tasks) {
+                        tasks[seatNumber] = {
+                            startTime: new Date(data.tasks[seatNumber].startTime)
+                        };
+                    }
+                    
+                    // 加载已完成任务
+                    if (data.completedTasks) {
+                        completedTasks = data.completedTasks.map(task => ({
+                            seatNumber: task.seatNumber,
+                            startTime: new Date(task.startTime),
+                            endTime: new Date(task.endTime),
+                            timeElapsed: task.timeElapsed
+                        }));
+                    }
+                    
+                    // 更新显示
+                    updateTasksDisplay();
+                    updateCompletedTasksDisplay();
                 }
-                
-                // 加载已完成任务
-                if (data.completedTasks) {
-                    completedTasks = data.completedTasks.map(task => ({
-                        seatNumber: task.seatNumber,
-                        startTime: new Date(task.startTime),
-                        endTime: new Date(task.endTime),
-                        timeElapsed: task.timeElapsed
-                    }));
-                }
-                
-                // 更新显示
-                updateTasksDisplay();
-                updateCompletedTasksDisplay();
+            } catch (error) {
+                console.error('加载数据失败:', error);
             }
         }
         
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', init);
+        // 全局函数，供HTML调用
+        window.endTask = endTask;
     </script>
 </body>
 </html>
