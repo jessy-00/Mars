@@ -1,4 +1,4 @@
-[index.html](https://github.com/user-attachments/files/23840261/index.html)
+[Uploading index.html…]()
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -165,6 +165,9 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 15px;
             margin-top: 20px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .result-item {
@@ -201,6 +204,18 @@
             padding: 20px;
         }
         
+        /* 统一宽度设置 - 以已完成任务栏宽度为准 */
+        .input-section,
+        .tasks-section {
+            width: calc(100% - 30px);
+            margin: 0 auto;
+        }
+        
+        .input-group,
+        .task-item {
+            width: 100%;
+        }
+        
         /* 响应式调整 */
         @media (max-width: 480px) {
             body {
@@ -222,6 +237,7 @@
             #startBtn {
                 margin-left: 0;
                 margin-top: 10px;
+                width: 100%;
             }
         }
     </style>
