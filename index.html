@@ -762,7 +762,7 @@
     </style>
 </head>
 <body>
-    <!-- 原有HTML结构保持不变 -->
+    <!-- 原有HTML结构保持不变，仅修改套餐按钮部分 -->
     <div class="app-container">
         <header>
             <h1>⏱️ 拼豆店时长计算器（商家优化版）</h1>
@@ -783,11 +783,11 @@
                 <input type="number" id="plannedMinutes" class="time-input" placeholder="自定义分钟数" min="1" max="480" autocomplete="off">
             </div>
             
+            <!-- 修改：删除90分钟套餐，更新其他套餐价格 -->
             <div class="package-buttons">
-                <button class="package-btn" data-minutes="30">30分钟<br>15元</button>
-                <button class="package-btn" data-minutes="60">60分钟<br>25元</button>
-                <button class="package-btn" data-minutes="90">90分钟<br>35元</button>
-                <button class="package-btn" data-minutes="120">120分钟<br>45元</button>
+                <button class="package-btn" data-minutes="30">30分钟<br>6.00元</button>
+                <button class="package-btn" data-minutes="60">60分钟<br>11.90元</button>
+                <button class="package-btn" data-minutes="120">120分钟<br>22.90元</button>
             </div>
             
             <input type="text" id="remarkInput" class="remark-input" placeholder="输入客人备注（可选，如：需要帮忙拼图案）" autocomplete="off">
@@ -877,6 +877,7 @@
         </div>
     </div>
     
+    <!-- 修改：价格设置模态框删除90分钟输入项 -->
     <div class="modal" id="priceModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -886,23 +887,19 @@
             <div class="modal-body">
                 <div class="modal-form-group">
                     <label class="modal-label">基础单价（元/分钟）</label>
-                    <input type="number" id="basePriceInput" class="modal-input" min="0.1" step="0.1" value="0.5">
+                    <input type="number" id="basePriceInput" class="modal-input" min="0.1" step="0.01" value="0.50">
                 </div>
                 <div class="modal-form-group">
                     <label class="modal-label">30分钟套餐价（元）</label>
-                    <input type="number" id="pkg30Input" class="modal-input" min="1" value="15">
+                    <input type="number" id="pkg30Input" class="modal-input" min="0.01" step="0.01" value="6.00">
                 </div>
                 <div class="modal-form-group">
                     <label class="modal-label">60分钟套餐价（元）</label>
-                    <input type="number" id="pkg60Input" class="modal-input" min="1" value="25">
-                </div>
-                <div class="modal-form-group">
-                    <label class="modal-label">90分钟套餐价（元）</label>
-                    <input type="number" id="pkg90Input" class="modal-input" min="1" value="35">
+                    <input type="number" id="pkg60Input" class="modal-input" min="0.01" step="0.01" value="11.90">
                 </div>
                 <div class="modal-form-group">
                     <label class="modal-label">120分钟套餐价（元）</label>
-                    <input type="number" id="pkg120Input" class="modal-input" min="1" value="45">
+                    <input type="number" id="pkg120Input" class="modal-input" min="0.01" step="0.01" value="22.90">
                 </div>
             </div>
             <div class="modal-footer">
@@ -915,17 +912,17 @@
     <div class="message-toast" id="messageToast"></div>
     
     <script>
-        // 原有变量定义保持不变
+        // 原有变量定义，修改PRICE_CONFIG配置
         let tasks = {};
         let completedTasks = [];
         
+        // 修改：更新价格配置，删除90分钟套餐，金额保留两位小数
         let PRICE_CONFIG = {
-            baseRate: 0.5,
+            baseRate: 0.50, // 基础单价保留两位小数
             packages: {
-                30: 15,
-                60: 25,
-                90: 35,
-                120: 45
+                30: 6.00,
+                60: 11.90,
+                120: 22.90
             }
         };
         
@@ -973,16 +970,16 @@
                     selectedPackage = parseInt(this.dataset.minutes);
                     document.getElementById('plannedMinutes').value = selectedPackage;
                     const pkgPrice = PRICE_CONFIG.packages[selectedPackage];
-                    showMessage(`已选择 ${selectedPackage} 分钟套餐，价格 ${pkgPrice} 元`, 'success');
+                    // 金额显示保留两位小数
+                    showMessage(`已选择 ${selectedPackage} 分钟套餐，价格 ${pkgPrice.toFixed(2)} 元`, 'success');
                 });
             });
             
             document.getElementById('priceSettingBtn').addEventListener('click', () => {
-                document.getElementById('basePriceInput').value = PRICE_CONFIG.baseRate;
-                document.getElementById('pkg30Input').value = PRICE_CONFIG.packages[30];
-                document.getElementById('pkg60Input').value = PRICE_CONFIG.packages[60];
-                document.getElementById('pkg90Input').value = PRICE_CONFIG.packages[90];
-                document.getElementById('pkg120Input').value = PRICE_CONFIG.packages[120];
+                document.getElementById('basePriceInput').value = PRICE_CONFIG.baseRate.toFixed(2);
+                document.getElementById('pkg30Input').value = PRICE_CONFIG.packages[30].toFixed(2);
+                document.getElementById('pkg60Input').value = PRICE_CONFIG.packages[60].toFixed(2);
+                document.getElementById('pkg120Input').value = PRICE_CONFIG.packages[120].toFixed(2);
                 document.getElementById('priceModal').classList.add('show');
             });
             
@@ -1006,11 +1003,11 @@
                 });
             });
             
-            // 导出按钮事件（保持不变，内部实现已修改）
+            // 导出按钮事件（保持不变）
             document.getElementById('exportBtn').addEventListener('click', exportReport);
         }
         
-        // 原有工具函数保持不变（updateCurrentTime、formatTime等）
+        // 原有工具函数保持不变，确保金额显示保留两位小数
         function updateCurrentTime() {
             const now = new Date();
             const dateString = now.toLocaleDateString('zh-CN');
@@ -1041,7 +1038,7 @@
             return `${year}-${month}-${day} ${hours}:${minutes}`;
         }
         
-        // 核心修改：重写exportReport函数为XLSX格式
+        // 导出报表函数保持不变
         function exportReport() {
             const now = new Date();
             const reportDate = now.toLocaleDateString('zh-CN').replace(/\//g, '-');
@@ -1121,7 +1118,7 @@
             showMessage('Excel统计报表已导出！', 'success');
         }
         
-        // 原有其他函数保持不变（startNewTask、endTask、updateTasksDisplay等）
+        // 原有其他函数保持不变，确保金额计算保留两位小数
         function startNewTask() {
             const seatInput = document.getElementById('seatInput');
             const plannedMinutesInput = document.getElementById('plannedMinutes');
@@ -1149,11 +1146,13 @@
             
             let priceInfo = {};
             if (PRICE_CONFIG.packages[plannedMinutes]) {
+                // 套餐价格保留两位小数
+                const pkgPrice = PRICE_CONFIG.packages[plannedMinutes];
                 priceInfo = {
-                    plannedPrice: PRICE_CONFIG.packages[plannedMinutes].toFixed(2),
+                    plannedPrice: pkgPrice.toFixed(2),
                     overtimePrice: '0.00',
                     overtimeMinutes: 0,
-                    totalPrice: PRICE_CONFIG.packages[plannedMinutes].toFixed(2),
+                    totalPrice: pkgPrice.toFixed(2),
                     description: `套餐价（${plannedMinutes}分钟）`,
                     isPackage: true
                 };
@@ -1164,7 +1163,7 @@
                     overtimePrice: '0.00',
                     overtimeMinutes: 0,
                     totalPrice: plannedPrice.toFixed(2),
-                    description: `基础价（${plannedMinutes}分钟 × ${PRICE_CONFIG.baseRate}元/分钟）`,
+                    description: `基础价（${plannedMinutes}分钟 × ${PRICE_CONFIG.baseRate.toFixed(2)}元/分钟）`,
                     isPackage: false
                 };
             }
@@ -1402,7 +1401,7 @@
                 
                 if (task.overtime > 0) {
                     priceDetailsHtml += `
-                        <div class="price-info">超时价格: ${task.price.overtimePrice}元（${task.price.overtimeMinutes}分钟 × ${PRICE_CONFIG.baseRate}元/分钟）</div>
+                        <div class="price-info">超时价格: ${task.price.overtimePrice}元（${task.price.overtimeMinutes}分钟 × ${PRICE_CONFIG.baseRate.toFixed(2)}元/分钟）</div>
                         <div class="price-info">合计价格: ${task.price.totalPrice}元</div>
                     `;
                 } else {
@@ -1483,34 +1482,35 @@
         
         function savePriceSettings() {
             const baseRate = parseFloat(document.getElementById('basePriceInput').value);
-            const pkg30 = parseInt(document.getElementById('pkg30Input').value);
-            const pkg60 = parseInt(document.getElementById('pkg60Input').value);
-            const pkg90 = parseInt(document.getElementById('pkg90Input').value);
-            const pkg120 = parseInt(document.getElementById('pkg120Input').value);
+            const pkg30 = parseFloat(document.getElementById('pkg30Input').value);
+            const pkg60 = parseFloat(document.getElementById('pkg60Input').value);
+            const pkg120 = parseFloat(document.getElementById('pkg120Input').value);
             
             if (isNaN(baseRate) || baseRate <= 0) {
                 showMessage('基础单价必须大于0！', 'warning');
                 return;
             }
             
-            if ([pkg30, pkg60, pkg90, pkg120].some(p => isNaN(p) || p <= 0)) {
+            if ([pkg30, pkg60, pkg120].some(p => isNaN(p) || p <= 0)) {
                 showMessage('套餐价格必须大于0！', 'warning');
                 return;
             }
             
+            // 保存时确保金额保留两位小数
             PRICE_CONFIG = {
-                baseRate: baseRate,
+                baseRate: parseFloat(baseRate.toFixed(2)),
                 packages: {
-                    30: pkg30,
-                    60: pkg60,
-                    90: pkg90,
-                    120: pkg120
+                    30: parseFloat(pkg30.toFixed(2)),
+                    60: parseFloat(pkg60.toFixed(2)),
+                    120: parseFloat(pkg120.toFixed(2))
                 }
             };
             
+            // 更新套餐按钮显示，确保金额两位小数
             document.querySelectorAll('.package-btn').forEach(btn => {
                 const minutes = btn.dataset.minutes;
-                btn.innerHTML = `${minutes}分钟<br>${PRICE_CONFIG.packages[minutes]}元`;
+                const price = PRICE_CONFIG.packages[minutes].toFixed(2);
+                btn.innerHTML = `${minutes}分钟<br>${price}元`;
             });
             
             saveData();
@@ -1572,17 +1572,27 @@
                     const data = JSON.parse(savedData);
                     
                     if (data.priceConfig) {
-                        PRICE_CONFIG = data.priceConfig;
+                        // 加载时确保金额保留两位小数
+                        PRICE_CONFIG = {
+                            baseRate: parseFloat(data.priceConfig.baseRate.toFixed(2)),
+                            packages: {
+                                30: parseFloat((data.priceConfig.packages[30] || 6.00).toFixed(2)),
+                                60: parseFloat((data.priceConfig.packages[60] || 11.90).toFixed(2)),
+                                120: parseFloat((data.priceConfig.packages[120] || 22.90).toFixed(2))
+                            }
+                        };
                     } else {
                         PRICE_CONFIG = {
-                            baseRate: 0.5,
-                            packages: { 30:15, 60:25, 90:35, 120:45 }
+                            baseRate: 0.50,
+                            packages: { 30:6.00, 60:11.90, 120:22.90 }
                         };
                     }
                     
+                    // 更新套餐按钮显示
                     document.querySelectorAll('.package-btn').forEach(btn => {
                         const minutes = btn.dataset.minutes;
-                        btn.innerHTML = `${minutes}分钟<br>${PRICE_CONFIG.packages[minutes]}元`;
+                        const price = PRICE_CONFIG.packages[minutes].toFixed(2);
+                        btn.innerHTML = `${minutes}分钟<br>${price}元`;
                     });
                     
                     tasks = {};
