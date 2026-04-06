@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能计时管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+        }
+
+        .header-info {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #1AAD19;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #179316;
+        }
+
+        .btn-danger {
+            background: #e64340;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d13a37;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-value.highlight {
+            color: #ff6b6b;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .add-table-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .form-input {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 200px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1AAD19;
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-card.active {
+            border: 2px solid #1AAD19;
+            background: linear-gradient(135deg, #fff 0%, #f0fff0 100%);
+        }
+
+        .table-card.inactive {
+            border: 2px solid #e0e0e0;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #1AAD19;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #ccc;
+            color: white;
+        }
+
+        .status-paused {
+            background: #ff9500;
+            color: white;
+        }
+
+        .status-countdown {
+            background: #667eea;
+            color: white;
+        }
+
+        .status-countdown-paused {
+            background: #9966cc;
+            color: white;
+        }
+
+        .status-timeout {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .status-timeout-paused {
+            background: #ff857a;
+            color: white;
+        }
+
+        .table-id {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .timer-display {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 15px;
+        }
+
+        .timer-time {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timer-cost {
+            font-size: 20px;
+            color: #ff6b6b;
+            font-weight: 500;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-actions .btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-table tr:hover {
+            background: #f8f8f8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .price-display {
+            text-align: center;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .price-display .price-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .price-display .price-value {
+            color: #1AAD19;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .confirm-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .modal-info {
+            background: #f0fff0;
+            border-left: 4px solid #1AAD19;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-info-item {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .login-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-overlay.show {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .login-input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #1AAD19;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+        }
+
+        .login-tip {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        .login-hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .add-table-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 授权界面 -->
+    <div class="login-overlay" id="authOverlay">
+        <div class="login-box">
+            <div class="login-logo">⏱️</div>
+            <h2 class="login-title">智能计时管理系统</h2>
+            <p class="login-subtitle">请输入授权密钥以激活系统</p>
+            <div id="authContent">
+                <div class="login-input-group">
+                    <input type="text" id="authKey" class="login-input" placeholder="请输入授权密钥" maxlength="50">
+                </div>
+                <button class="btn btn-primary login-btn" onclick="checkAuth()">激活系统</button>
+                <p class="login-tip" id="authTip"></p>
+                <div class="login-hint" id="authHint"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent">
+        <div class="header">
+            <h1>智能计时管理系统</h1>
+            <div class="header-info">
+                <div>当前时间：<span id="currentTime"></span></div>
+                <div>今日日期：<span id="currentDate"></span></div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="lockSystem()">🔒 锁定系统</button>
+                <button class="btn btn-secondary" onclick="showPasswordModal()">🔑 修改密码</button>
+                <button class="btn btn-secondary" onclick="showPriceModal()">💰 修改单价</button>
+                <button class="btn btn-secondary" onclick="resetSystem()">🔄 重置系统</button>
+                <button class="btn btn-secondary" onclick="exportTodayRecords()">📥 导出今日记录</button>
+                <button class="btn btn-secondary" onclick="exportAllRecords()">📥 导出所有记录</button>
+                <button class="btn btn-danger" onclick="clearHistory()">🗑️ 清空历史</button>
+                <button class="btn btn-secondary" onclick="showDebugInfo()">🔧 调试</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">总桌数</div>
+                <div class="stat-value" id="totalTables">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">使用中</div>
+                <div class="stat-value highlight" id="activeTables">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">空闲</div>
+                <div class="stat-value" id="inactiveTables">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">今日收入</div>
+                <div class="stat-value highlight" id="todayIncome">¥0.00</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">今日订单数</div>
+                <div class="stat-value" id="todayOrders">0</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 桌子管理</h2>
+                <div class="add-table-form">
+                    <input type="text" id="tableNameInput" class="form-input" placeholder="桌号名称（如：1号桌）">
+                    <button class="btn btn-primary" onclick="addTable()">➕ 添加桌子</button>
+                </div>
+            </div>
+            <div class="tables-grid" id="tablesGrid">
+                <!-- 桌子卡片将通过JS动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📊 计时记录</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="loadHistory()">🔄 刷新</button>
+                    <button class="btn btn-secondary" onclick="historyPrevDay()">⬅️ 前一天</button>
+                    <span id="historyDateRange" style="color: #666; font-size: 14px; font-weight: 500;"></span>
+                    <button class="btn btn-secondary" onclick="historyNextDay()">后一天 ➡️</button>
+                    <button class="btn btn-secondary" onclick="historyToday()">今天</button>
+                </div>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>桌号</th>
+                        <th>开始时间</th>
+                        <th>结束时间</th>
+                        <th>使用时长</th>
+                        <th>费用</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- 历史记录将通过JS动态生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 登录界面 -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="login-logo">🔒</div>
+            <h2 class="login-title">系统已锁定</h2>
+            <div id="loginContent"></div>
+        </div>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">确认操作</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ 授权系统 ============
+        const AUTH_SECRET_KEY = 'TimerSystem2024'; // 授权密钥的盐值，请勿泄露
+        
+        // 根据日期生成正确的密钥
+        function generateKeyByDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const dateStr = `${year}${month}${day}`;
+            
+            // 简单加密：日期 + 盐值 的某种变换
+            // 这里是示例：取日期的MD5前8位作为密钥
+            return simpleHash(dateStr + AUTH_SECRET_KEY);
+        }
+
+        // 简单的哈希函数（生成8位密钥）
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            const absHash = Math.abs(hash);
+            // 生成8位大写字母数字组合
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let key = '';
+            let num = absHash;
+            for (let i = 0; i < 8; i++) {
+                key += chars[num % chars.length];
+                num = Math.floor(num / chars.length) + (i * 12345);
+                num = num % 2147483647;
+            }
+            return key;
+        }
+
+        // 检查授权状态
+        function checkAuthorization() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authHint = document.getElementById('authHint');
+            const authKeyInput = document.getElementById('authKey');
+            
+            // 显示今天的日期提示
+            const now = new Date();
+            const dateHint = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+            authHint.innerHTML = `提示：请联系服务商获取今日授权密钥<br>日期：${dateHint}<br><br>密钥格式示例：XXXXXXXX（8位）`;
+
+            // 检查是否已授权
+            const authorized = localStorage.getItem('timer_system_authorized');
+            if (authorized === 'true') {
+                // 已授权，隐藏授权界面
+                authOverlay.classList.remove('show');
+                // 初始化系统
+                init();
+            } else {
+                // 未授权，显示授权界面
+                authOverlay.classList.add('show');
+                if (authKeyInput) {
+                    authKeyInput.value = '';
+                    authKeyInput.focus();
+                }
+            }
+        }
+
+        // 验证授权密钥
+        function checkAuth() {
+            const inputKey = document.getElementById('authKey').value.trim().toUpperCase();
+            const correctKey = generateKeyByDate();
+            const authTip = document.getElementById('authTip');
+
+            if (inputKey === correctKey) {
+                // 授权成功
+                localStorage.setItem('timer_system_authorized', 'true');
+                document.getElementById('authOverlay').classList.remove('show');
+                alert('授权成功！欢迎使用智能计时管理系统。');
+                // 初始化系统
+                init();
+            } else {
+                authTip.textContent = '授权密钥错误，请联系服务商获取正确的密钥';
+                document.getElementById('authKey').value = '';
+                document.getElementById('authKey').focus();
+            }
+        }
+
+        // 回车键提交授权
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('authKey').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAuth();
+                }
+            });
+        });
+
+        // ============ 数据存储键名 ============
+        const STORAGE_KEYS = {
+            TABLES: 'pindou_tables',
+            HISTORY: 'pindou_history',
+            PRICE: 'pindou_price',
+            PASSWORD: 'system_password',
+            PASSWORD_SET: 'password_is_set'
+        };
+
+        // ============ 全局状态 ============
+        let tables = [];
+        let history = [];
+        let timerInterval = null;
+        let currentConfirmCallback = null;
+        let pricePerHour = 30;
+        let pricePerMinute = 0.5;
+        let countdownTimers = {};
+        let historyCurrentDate = new Date();
+        let isLoggedIn = false;
+
+        // ============ 主初始化 ============
+        function init() {
+            loadFromStorage();
+            renderTables();
+            loadHistory();
+            startTimer();
+            updateStats();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            checkFirstLogin();
+        }
+
+        // ============ 密码系统 ============
+        function checkFirstLogin() {
+            const passwordSet = localStorage.getItem(STORAGE_KEYS.PASSWORD_SET);
+            const loginOverlay = document.getElementById('loginOverlay');
+            const loginContent = document.getElementById('loginContent');
+
+            if (passwordSet === 'true') {
+                loginOverlay.classList.remove('show');
+                isLoggedIn = true;
+            } else {
+                loginContent.innerHTML = `
+                    <p class="login-subtitle">首次使用，请设置管理员密码</p>
+                    <div class="login-input-group">
+                        <input type="password" id="setPassword" class="login-input" placeholder="设置密码（4-20位）" maxlength="20">
+                    </div>
+                    <div class="login-input-group">
+                        <input type="password" id="confirmPassword" class="login-input" placeholder="确认密码" maxlength="20">
+                    </div>
+                    <button class="btn btn-primary login-btn" onclick="setPassword()">设置密码</button>
+                    <p class="login-tip" id="loginTip"></p>
+                `;
+                loginOverlay.classList.add('show');
+            }
+        }
+
+        function setPassword() {
+            const password = document.getElementById('setPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const loginTip = document.getElementById('loginTip');
+
+            if (password.length < 4 || password.length > 20) {
+                loginTip.textContent = '密码长度需要4-20位';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                loginTip.textContent = '两次输入的密码不一致';
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.PASSWORD, password);
+            localStorage.setItem(STORAGE_KEYS.PASSWORD_SET, 'true');
+            document.getElementById('loginOverlay').classList.remove('show');
+            isLoggedIn = true;
+            alert('密码设置成功！');
+        }
+
+        function checkPassword() {
+            const inputPassword = document.getElementById('loginPassword').value;
+            const storedPassword = localStorage.getItem(STORAGE_KEYS.PASSWORD);
+            const loginTip = document.getElementById('loginTip');
+
+            if (inputPassword === storedPassword) {
+                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('loginPassword').value = '';
+                isLoggedIn = true;
+            } else {
+                loginTip.textContent = '密码错误，请重新输入';
+            }
+        }
+
+        function lockSystem() {
+            isLoggedIn = false;
+            document.getElementById('loginOverlay').classList.add('show');
+            document.getElementById('loginContent').innerHTML = `
+                <p class="login-subtitle">请输入管理员密码</p>
+                <div class="login-input-group">
+                    <input type="password" id="loginPassword" class="login-input" placeholder="请输入管理员密码" maxlength="20">
+                </div>
+                <button class="btn btn-primary login-btn" onclick="checkPassword()">登录</button>
+                <p class="login-tip" id="loginTip"></p>
+            `;
+        }
+
+        function showPasswordModal() {
+            const modalBody = `
+                <div class="login-input-group">
+                    <input type="password" id="oldPassword" class="form-input" placeholder="请输入原密码" style="width: 100%; margin-bottom: 10px;">
+                </div>
+                <div class="login-input-group">
+                    <input type="password" id="newPassword" class="form-input" placeholder="请输入新密码（4-20位）" style="width: 100%; margin-bottom: 10px;">
+                </div>
+                <div class="login-input-group">
+                    <input type="password" id="confirmNewPassword" class="form-input" placeholder="请再次输入新密码" style="width: 100%;">
+                </div>
+            `;
+
+            showModal('🔑 修改密码', modalBody, () => {
+                const oldPwd = document.getElementById('oldPassword').value;
+                const newPwd = document.getElementById('newPassword').value;
+                const confirmPwd = document.getElementById('confirmNewPassword').value;
+                const storedPassword = localStorage.getItem(STORAGE_KEYS.PASSWORD);
+
+                if (oldPwd !== storedPassword) {
+                    alert('原密码错误');
+                    return;
+                }
+
+                if (newPwd.length < 4 || newPwd.length > 20) {
+                    alert('新密码长度需要4-20位');
+                    return;
+                }
+
+                if (newPwd !== confirmPwd) {
+                    alert('两次输入的新密码不一致');
+                    return;
+                }
+
+                localStorage.setItem(STORAGE_KEYS.PASSWORD, newPwd);
+                closeModal();
+                alert('密码修改成功！');
+            });
+        }
+
+        // ============ 数据存储 ============
+        function loadFromStorage() {
+            const storedTables = localStorage.getItem(STORAGE_KEYS.TABLES);
+            const storedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
+            const storedPrice = localStorage.getItem(STORAGE_KEYS.PRICE);
+
+            if (storedTables) {
+                tables = JSON.parse(storedTables);
+                tables = tables.map(table => ({
+                    ...table,
+                    countdownTotal: table.countdownTotal || 0,
+                    countdownStartTime: table.countdownStartTime || null
+                }));
+            } else {
+                initializeDefaultTables();
+            }
+
+            tables.forEach(table => {
+                if ((table.countdownStatus === 'timeout' || table.countdownStatus === 'timeout-paused') && table.countdownStartTime) {
+                    const elapsedSeconds = Math.floor((Date.now() - table.countdownStartTime) / 1000);
+                    table.countdownRemaining = table.countdownTotal - elapsedSeconds;
+                }
+            });
+
+            if (storedHistory) {
+                history = JSON.parse(storedHistory);
+            }
+
+            if (storedPrice) {
+                pricePerHour = parseFloat(storedPrice);
+                pricePerMinute = pricePerHour / 60;
+            }
+        }
+
+        function initializeDefaultTables() {
+            tables = [];
+            for (let i = 1; i <= 10; i++) {
+                tables.push({
+                    id: Date.now() + i,
+                    name: `${i}号桌`,
+                    status: 'inactive',
+                    startTime: null,
+                    elapsedSeconds: 0,
+                    cost: 0,
+                    countdownRemaining: 0,
+                    countdownStatus: 'none',
+                    countdownTotal: 0,
+                    countdownStartTime: null
+                });
+            }
+            saveToStorage();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEYS.TABLES, JSON.stringify(tables));
+            localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
+            localStorage.setItem(STORAGE_KEYS.PRICE, pricePerHour.toString());
+        }
+
+        // ============ 桌子管理 ============
+        function addTable() {
+            const nameInput = document.getElementById('tableNameInput');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('请输入桌号名称');
+                return;
+            }
+
+            const newTable = {
+                id: Date.now(),
+                name: name,
+                status: 'inactive',
+                startTime: null,
+                elapsedSeconds: 0,
+                cost: 0,
+                countdownRemaining: 0,
+                countdownStatus: 'none',
+                countdownTotal: 0,
+                countdownStartTime: null
+            };
+
+            tables.push(newTable);
+            saveToStorage();
+            renderTables();
+            updateStats();
+
+            nameInput.value = '';
+            alert(`已添加：${name}`);
+        }
+
+        function deleteTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            
+            if (table.status === 'active') {
+                alert('该桌子正在使用中，无法删除！请先结束计时。');
+                return;
+            }
+
+            showModal(
+                `确认删除`,
+                `确定要删除「${table.name}」吗？`,
+                () => {
+                    tables = tables.filter(t => t.id !== tableId);
+                    saveToStorage();
+                    renderTables();
+                    updateStats();
+                    closeModal();
+                    alert(`已删除：${table.name}`);
+                }
+            );
+        }
+
+        function renderTables() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = '';
+
+            if (tables.length === 0) {
+                grid.innerHTML = '<div class="empty-state">暂无桌子，请先添加桌子</div>';
+                return;
+            }
+
+            tables.forEach(table => {
+                const card = document.createElement('div');
+                let statusText = '空闲';
+                let statusClass = 'status-inactive';
+                let timerDisplay = '';
+
+                if (table.status === 'active') {
+                    statusText = '计时中';
+                    statusClass = 'status-active';
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}">${formatTime(table.elapsedSeconds)}</div>
+                            <div class="timer-cost">¥${table.cost.toFixed(2)}</div>
+                        </div>
+                    `;
+                } else if (table.status === 'paused') {
+                    statusText = '已暂停';
+                    statusClass = 'status-paused';
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}">${formatTime(table.elapsedSeconds)}</div>
+                            <div class="timer-cost">¥${table.cost.toFixed(2)}</div>
+                        </div>
+                    `;
+                } else if (table.countdownStatus === 'active') {
+                    statusText = '倒计时中';
+                    statusClass = 'status-countdown';
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}">${formatTime(table.countdownRemaining)}</div>
+                            <div class="timer-cost" style="color: #667eea;">⏱️ 倒计时</div>
+                        </div>
+                    `;
+                } else if (table.countdownStatus === 'paused') {
+                    statusText = '倒计时暂停';
+                    statusClass = 'status-countdown-paused';
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}">${formatTime(table.countdownRemaining)}</div>
+                            <div class="timer-cost" style="color: #667eea;">⏱️ 倒计时</div>
+                        </div>
+                    `;
+                } else if (table.countdownStatus === 'timeout') {
+                    statusText = '已超时';
+                    statusClass = 'status-timeout';
+                    const overtimeText = `超时: ${formatTime(Math.abs(table.countdownRemaining))}`;
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}" style="color: #8b0000;">${overtimeText}</div>
+                            <div class="timer-cost" style="color: #8b0000;">⏰ 超时中</div>
+                        </div>
+                    `;
+                } else if (table.countdownStatus === 'timeout-paused') {
+                    statusText = '超时暂停';
+                    statusClass = 'status-timeout-paused';
+                    const overtimeText = `超时: ${formatTime(Math.abs(table.countdownRemaining))}`;
+                    timerDisplay = `
+                        <div class="timer-display">
+                            <div class="timer-time" id="timer-${table.id}" style="color: #8b0000;">${overtimeText}</div>
+                            <div class="timer-cost" style="color: #8b0000;">⏰ 超时暂停</div>
+                        </div>
+                    `;
+                }
+
+                card.className = `table-card ${statusClass}`;
+                card.innerHTML = `
+                    <div class="table-header">
+                        <span class="table-number">${table.name}</span>
+                        <span class="table-status ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div class="table-id">ID: ${table.id}</div>
+                    ${timerDisplay}
+                    <div class="table-actions">
+                        ${table.status === 'inactive' && table.countdownStatus === 'none' ? `
+                            <button class="btn btn-primary" onclick="startTimerTable(${table.id})">▶ 开始计时</button>
+                            <button class="btn btn-secondary" onclick="showCountdownModal(${table.id})">⏱️ 设定倒计时</button>
+                            <button class="btn btn-secondary" onclick="deleteTable(${table.id})">🗑️ 删除</button>
+                        ` : ''}
+                        ${table.status === 'active' ? `
+                            <button class="btn btn-secondary" onclick="pauseTimerTable(${table.id})">⏸ 暂停计时</button>
+                            <button class="btn btn-danger" onclick="stopTimerTable(${table.id})">⏹ 结束计时</button>
+                        ` : ''}
+                        ${table.status === 'paused' && table.countdownStatus === 'none' ? `
+                            <button class="btn btn-primary" onclick="resumeTimerTable(${table.id})">▶ 恢复计时</button>
+                            <button class="btn btn-danger" onclick="stopTimerTable(${table.id})">⏹ 结束计时</button>
+                        ` : ''}
+                        ${table.countdownStatus === 'active' ? `
+                            <button class="btn btn-secondary" onclick="pauseCountdown(${table.id})">⏸ 暂停倒计时</button>
+                            <button class="btn btn-secondary" onclick="showAddTimeModal(${table.id})">➕ 加时间</button>
+                            <button class="btn btn-danger" onclick="stopCountdown(${table.id})">⏹ 结束倒计时</button>
+                        ` : ''}
+                        ${table.countdownStatus === 'paused' ? `
+                            <button class="btn btn-primary" onclick="resumeCountdown(${table.id})">▶ 恢复倒计时</button>
+                            <button class="btn btn-secondary" onclick="showAddTimeModal(${table.id})">➕ 加时间</button>
+                            <button class="btn btn-danger" onclick="stopCountdown(${table.id})">⏹ 结束倒计时</button>
+                        ` : ''}
+                        ${table.countdownStatus === 'timeout' ? `
+                            <button class="btn btn-secondary" onclick="pauseCountdown(${table.id})">⏸ 暂停超时</button>
+                            <button class="btn btn-secondary" onclick="showAddTimeModal(${table.id})">➕ 加时间抵消超时</button>
+                            <button class="btn btn-danger" onclick="stopCountdown(${table.id})">⏹ 结束倒计时</button>
+                        ` : ''}
+                        ${table.countdownStatus === 'timeout-paused' ? `
+                            <button class="btn btn-primary" onclick="resumeCountdown(${table.id})">▶ 恢复超时</button>
+                            <button class="btn btn-secondary" onclick="showAddTimeModal(${table.id})">➕ 加时间抵消超时</button>
+                            <button class="btn btn-danger" onclick="stopCountdown(${table.id})">⏹ 结束倒计时</button>
+                        ` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ============ 计时功能 ============
+        function startTimerTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            table.status = 'active';
+            table.startTime = Date.now();
+            table.elapsedSeconds = 0;
+            table.cost = 0;
+
+            saveToStorage();
+            renderTables();
+            updateStats();
+        }
+
+        function pauseTimerTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table || table.status !== 'active') return;
+
+            table.elapsedSeconds = Math.floor((Date.now() - table.startTime) / 1000);
+            table.cost = Math.ceil(table.elapsedSeconds / 60) * pricePerMinute;
+
+            table.status = 'paused';
+            table.pauseTime = Date.now();
+
+            saveToStorage();
+            renderTables();
+        }
+
+        function resumeTimerTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table || table.status !== 'paused') return;
+
+            const pauseDuration = Date.now() - table.pauseTime;
+            table.startTime += pauseDuration;
+            table.status = 'active';
+
+            saveToStorage();
+            renderTables();
+        }
+
+        function stopTimerTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table || (table.status !== 'active' && table.status !== 'paused')) return;
+
+            const endTime = Date.now();
+            const startTime = table.startTime;
+            const elapsedSeconds = table.elapsedSeconds;
+            const cost = table.cost;
+
+            showModal(
+                `结束计时`,
+                `
+                    <div class="modal-info">
+                        <div class="modal-info-item"><strong>桌号：</strong>${table.name}</div>
+                        <div class="modal-info-item"><strong>使用时长：</strong>${formatDuration(elapsedSeconds)}</div>
+                        <div class="modal-info-item"><strong>本次费用：</strong><span style="color: #ff6b6b; font-size: 24px; font-weight: bold;">¥${cost.toFixed(2)}</span></div>
+                    </div>
+                    <div>确认结束计时吗？</div>
+                `,
+                () => {
+                    history.push({
+                        id: Date.now(),
+                        tableId: table.id,
+                        tableName: table.name,
+                        startTime: startTime,
+                        endTime: endTime,
+                        elapsedSeconds: elapsedSeconds,
+                        cost: cost
+                    });
+
+                    table.status = 'inactive';
+                    table.startTime = null;
+                    table.elapsedSeconds = 0;
+                    table.cost = 0;
+
+                    saveToStorage();
+                    renderTables();
+                    loadHistory();
+                    updateStats();
+                    closeModal();
+                }
+            );
+        }
+
+        // ============ 倒计时功能 ============
+        function showCountdownModal(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            const modalBody = `
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">设置倒计时时间</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="countdownHours" class="form-input" placeholder="小时" min="0" style="width: 80px;">
+                        <span>时</span>
+                        <input type="number" id="countdownMinutes" class="form-input" placeholder="分钟" min="0" max="59" style="width: 80px;">
+                        <span>分</span>
+                    </div>
+                </div>
+                <p style="color: #999; font-size: 12px; margin-top: 15px;">
+                    ⏱️ 倒计时结束后会自动提醒
+                </p>
+            `;
+
+            showModal(
+                '⏱️ 设定倒计时',
+                modalBody,
+                () => {
+                    const hours = parseInt(document.getElementById('countdownHours').value) || 0;
+                    const minutes = parseInt(document.getElementById('countdownMinutes').value) || 0;
+
+                    if (hours === 0 && minutes === 0) {
+                        alert('请输入倒计时时间');
+                        return;
+                    }
+
+                    const totalSeconds = (hours * 3600) + (minutes * 60);
+                    startCountdown(tableId, totalSeconds, table.name);
+                    closeModal();
+                }
+            );
+        }
+
+        function startCountdown(tableId, seconds, tableName) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            table.countdownRemaining = seconds;
+            table.countdownStatus = 'active';
+            table.countdownTotal = seconds;
+            table.countdownStartTime = Date.now();
+
+            if (countdownTimers[tableId]) {
+                clearInterval(countdownTimers[tableId]);
+            }
+
+            saveToStorage();
+            renderTables();
+        }
+
+        function pauseCountdown(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table || (table.countdownStatus !== 'active' && table.countdownStatus !== 'timeout')) return;
+
+            if (countdownTimers[tableId]) {
+                clearInterval(countdownTimers[tableId]);
+                delete countdownTimers[tableId];
+            }
+
+            if (table.countdownStatus === 'active') {
+                table.countdownStatus = 'paused';
+            } else if (table.countdownStatus === 'timeout') {
+                table.countdownStatus = 'timeout-paused';
+            }
+            table.countdownPauseTime = Date.now();
+
+            saveToStorage();
+            renderTables();
+        }
+
+        function resumeCountdown(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table || (table.countdownStatus !== 'paused' && table.countdownStatus !== 'timeout-paused')) return;
+
+            const pauseDuration = Date.now() - table.countdownPauseTime;
+            table.countdownStartTime += pauseDuration;
+
+            if (table.countdownStatus === 'paused') {
+                table.countdownStatus = 'active';
+            } else if (table.countdownStatus === 'timeout-paused') {
+                table.countdownStatus = 'timeout';
+            }
+
+            saveToStorage();
+            renderTables();
+        }
+
+        function stopCountdown(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            if (countdownTimers[tableId]) {
+                clearInterval(countdownTimers[tableId]);
+                delete countdownTimers[tableId];
+            }
+
+            const endTime = Date.now();
+            let startTime, actualElapsedSeconds, cost;
+
+            if (table.countdownStatus === 'timeout' || table.countdownStatus === 'timeout-paused') {
+                startTime = table.countdownStartTime || Date.now() - table.countdownTotal * 1000;
+                actualElapsedSeconds = Math.floor((endTime - startTime) / 1000);
+            } else {
+                if (table.countdownStartTime) {
+                    startTime = table.countdownStartTime;
+                    actualElapsedSeconds = Math.floor((endTime - startTime) / 1000);
+                } else {
+                    actualElapsedSeconds = table.countdownTotal - table.countdownRemaining;
+                    startTime = endTime - actualElapsedSeconds * 1000;
+                }
+            }
+            
+            cost = Math.ceil(actualElapsedSeconds / 60) * pricePerMinute;
+
+            showModal(
+                `结束倒计时`,
+                `
+                    <div class="modal-info">
+                        <div class="modal-info-item"><strong>桌号：</strong>${table.name}</div>
+                        <div class="modal-info-item"><strong>实际使用时长：</strong>${formatDuration(actualElapsedSeconds)}</div>
+                        <div class="modal-info-item"><strong>本次费用：</strong><span style="color: #ff6b6b; font-size: 24px; font-weight: bold;">¥${cost.toFixed(2)}</span></div>
+                    </div>
+                    <div>确认结束倒计时吗？</div>
+                `,
+                () => {
+                    history.push({
+                        id: Date.now(),
+                        tableId: table.id,
+                        tableName: table.name,
+                        startTime: startTime,
+                        endTime: endTime,
+                        elapsedSeconds: actualElapsedSeconds,
+                        cost: cost
+                    });
+
+                    table.countdownRemaining = 0;
+                    table.countdownStatus = 'none';
+                    table.countdownTotal = 0;
+                    delete table.countdownStartTime;
+
+                    saveToStorage();
+                    loadHistory();
+                    updateStats();
+                    renderTables();
+                    closeModal();
+                }
+            );
+        }
+
+        function showAddTimeModal(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            const uniqueId = `addtime-${tableId}`;
+            const modalBody = `
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">当前剩余时间：<strong>${formatTime(table.countdownRemaining)}</strong></label>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">要增加的时间</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="${uniqueId}-hours" class="form-input" placeholder="小时" min="0" style="width: 80px;">
+                        <span>时</span>
+                        <input type="number" id="${uniqueId}-minutes" class="form-input" placeholder="分钟" min="0" max="59" style="width: 80px;">
+                        <span>分</span>
+                    </div>
+                </div>
+                <p style="color: #999; font-size: 12px; margin-top: 15px;">
+                    ⏱️ 增加的时间会累加到当前倒计时中
+                </p>
+            `;
+
+            showModal(
+                '➕ 增加倒计时',
+                modalBody,
+                () => {
+                    const hoursInput = document.getElementById(`${uniqueId}-hours`);
+                    const minutesInput = document.getElementById(`${uniqueId}-minutes`);
+
+                    const hours = hoursInput ? parseInt(hoursInput.value) || 0 : 0;
+                    const minutes = minutesInput ? parseInt(minutesInput.value) || 0 : 0;
+
+                    if (hours === 0 && minutes === 0) {
+                        alert('请输入要增加的时间');
+                        return;
+                    }
+
+                    const addSeconds = (hours * 3600) + (minutes * 60);
+                    addCountdownTime(tableId, addSeconds);
+                    closeModal();
+                }
+            );
+        }
+
+        function addCountdownTime(tableId, seconds) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+
+            table.countdownTotal += seconds;
+
+            if (table.countdownStatus === 'paused') {
+                table.countdownRemaining += seconds;
+            } else if (table.countdownStatus === 'active') {
+                table.countdownRemaining += seconds;
+                table.countdownStartTime = Date.now() - (table.countdownTotal - table.countdownRemaining) * 1000;
+            } else if (table.countdownStatus === 'timeout' || table.countdownStatus === 'timeout-paused') {
+                table.countdownRemaining += seconds;
+                table.countdownStartTime = Date.now() - (table.countdownTotal - table.countdownRemaining) * 1000;
+
+                if (table.countdownRemaining > 0) {
+                    table.countdownStatus = 'active';
+                }
+            }
+
+            saveToStorage();
+            renderTables();
+            alert(`已增加 ${formatTime(seconds)}`);
+        }
+
+        // ============ 定时器 ============
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                tables.forEach(table => {
+                    if (table.status === 'active') {
+                        table.elapsedSeconds = Math.floor((Date.now() - table.startTime) / 1000);
+                        table.cost = Math.ceil(table.elapsedSeconds / 60) * pricePerMinute;
+
+                        const timerElement = document.getElementById(`timer-${table.id}`);
+                        if (timerElement) {
+                            timerElement.textContent = formatTime(table.elapsedSeconds);
+                        }
+
+                        const costElement = timerElement?.parentElement?.querySelector('.timer-cost');
+                        if (costElement) {
+                            costElement.textContent = `¥${table.cost.toFixed(2)}`;
+                        }
+                    }
+
+                    if (table.countdownStatus === 'active' && table.countdownStartTime) {
+                        const elapsedSeconds = Math.floor((Date.now() - table.countdownStartTime) / 1000);
+                        table.countdownRemaining = Math.max(0, table.countdownTotal - elapsedSeconds);
+
+                        const timerElement = document.getElementById(`timer-${table.id}`);
+                        if (timerElement) {
+                            timerElement.textContent = formatTime(table.countdownRemaining);
+                        }
+
+                        if (table.countdownRemaining <= 0) {
+                            if (table.countdownStatus !== 'timeout') {
+                                alert(`🔔 ${table.name} 倒计时结束！`);
+                                table.countdownStatus = 'timeout';
+                                renderTables();
+                            }
+                        }
+                    }
+
+                    if (table.countdownStatus === 'timeout' && table.countdownStartTime) {
+                        const elapsedSeconds = Math.floor((Date.now() - table.countdownStartTime) / 1000);
+                        table.countdownRemaining = table.countdownTotal - elapsedSeconds;
+
+                        const timerElement = document.getElementById(`timer-${table.id}`);
+                        if (timerElement) {
+                            const overtimeText = `超时: ${formatTime(Math.abs(table.countdownRemaining))}`;
+                            timerElement.textContent = overtimeText;
+                        }
+                    }
+                });
+            }, 1000);
+        }
+
+        // ============ 工具函数 ============
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 0) {
+                return `${hours}小时${minutes}分钟`;
+            }
+            return `${minutes}分钟`;
+        }
+
+        function formatDateTime(timestamp) {
+            const date = new Date(timestamp);
+            return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN');
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+        }
+
+        function updateStats() {
+            const activeCount = tables.filter(t => t.status === 'active').length;
+            const countdownCount = tables.filter(t => t.countdownStatus === 'active' || t.countdownStatus === 'timeout' || t.countdownStatus === 'timeout-paused').length;
+            const inactiveCount = tables.length - activeCount - countdownCount;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayRecords = history.filter(record => {
+                const recordDate = new Date(record.endTime);
+                recordDate.setHours(0, 0, 0, 0);
+                return recordDate.getTime() === today.getTime();
+            });
+
+            const todayIncome = todayRecords.reduce((sum, r) => sum + r.cost, 0);
+
+            document.getElementById('totalTables').textContent = tables.length;
+            document.getElementById('activeTables').textContent = activeCount + countdownCount;
+            document.getElementById('inactiveTables').textContent = inactiveCount;
+            document.getElementById('todayIncome').textContent = `¥${todayIncome.toFixed(2)}`;
+            document.getElementById('todayOrders').textContent = todayRecords.length;
+        }
+
+        // ============ 历史记录 ============
+        function loadHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const startDate = new Date(historyCurrentDate);
+            startDate.setHours(0, 0, 0, 0);
+
+            document.getElementById('historyDateRange').textContent = formatDateRange(historyCurrentDate);
+
+            const dayRecords = history.filter(record => {
+                const recordDate = new Date(record.startTime);
+                const recordLocalDate = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate());
+                const currentLocalDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                return recordLocalDate.getTime() === currentLocalDate.getTime();
+            });
+
+            const sortedHistory = [...dayRecords].sort((a, b) => b.startTime - a.startTime);
+
+            if (sortedHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">该日期暂无计时记录</td></tr>';
+                return;
+            }
+
+            sortedHistory.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.tableName}</td>
+                    <td>${formatDateTime(record.startTime)}</td>
+                    <td>${formatDateTime(record.endTime)}</td>
+                    <td>${formatDuration(record.elapsedSeconds)}</td>
+                    <td style="color: #ff6b6b; font-weight: bold;">¥${record.cost.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function formatDateRange(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const compareDate = new Date(date);
+            compareDate.setHours(0, 0, 0, 0);
+
+            if (compareDate.getTime() === today.getTime()) {
+                return '今天';
+            }
+
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (compareDate.getTime() === yesterday.getTime()) {
+                return '昨天';
+            }
+
+            return `${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        function historyPrevDay() {
+            historyCurrentDate.setDate(historyCurrentDate.getDate() - 1);
+            loadHistory();
+        }
+
+        function historyNextDay() {
+            historyCurrentDate.setDate(historyCurrentDate.getDate() + 1);
+            loadHistory();
+        }
+
+        function historyToday() {
+            historyCurrentDate = new Date();
+            loadHistory();
+        }
+
+        // ============ 弹窗功能 ============
+        function showModal(title, body, callback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('confirmModal').classList.add('show');
+            currentConfirmCallback = callback;
+
+            document.getElementById('modalConfirmBtn').onclick = () => {
+                if (currentConfirmCallback) {
+                    currentConfirmCallback();
+                }
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            currentConfirmCallback = null;
+        }
+
+        // ============ 价格设置 ============
+        function showPriceModal() {
+            const modalBody = `
+                <div class="price-display" style="margin-bottom: 20px;">
+                    <div class="price-label">当前单价</div>
+                    <div class="price-value">¥${pricePerHour.toFixed(2)} / 小时</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">新单价（元/小时）</label>
+                    <input type="number" id="newPriceInput" class="form-input" placeholder="输入新单价" step="1" value="${pricePerHour}" style="width: 100%;">
+                </div>
+                <p style="color: #999; font-size: 12px; margin-top: 15px;">
+                    ⚠️ 注意：此修改仅对新开始的计时生效，正在计时的桌子仍按原价格计算。
+                </p>
+            `;
+            
+            showModal('💰 修改单价', modalBody, () => {
+                const newPriceInput = document.getElementById('newPriceInput');
+                const newPrice = parseFloat(newPriceInput.value);
+
+                if (!newPrice || newPrice <= 0) {
+                    alert('请输入有效的单价');
+                    return;
+                }
+
+                pricePerHour = newPrice;
+                pricePerMinute = pricePerHour / 60;
+                saveToStorage();
+                closeModal();
+                alert(`单价已修改为 ¥${pricePerHour.toFixed(2)} / 小时`);
+            });
+        }
+
+        // ============ 导出功能 ============
+        function exportTodayRecords() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayRecords = history.filter(record => {
+                const recordDate = new Date(record.endTime);
+                recordDate.setHours(0, 0, 0, 0);
+                return recordDate.getTime() === today.getTime();
+            });
+
+            if (todayRecords.length === 0) {
+                alert('今日暂无记录可导出');
+                return;
+            }
+
+            exportToCSV(todayRecords, `计时系统今日记录_${formatDateForFile(new Date())}.csv`);
+        }
+
+        function exportAllRecords() {
+            if (history.length === 0) {
+                alert('暂无记录可导出');
+                return;
+            }
+
+            exportToCSV(history, `计时系统所有记录_${formatDateForFile(new Date())}.csv`);
+        }
+
+        function exportToCSV(records, filename) {
+            const headers = ['桌号', '开始时间', '结束时间', '使用时长(分钟)', '费用(元)'];
+            const rows = records.map(record => [
+                record.tableName,
+                formatDateTime(record.startTime),
+                formatDateTime(record.endTime),
+                (record.elapsedSeconds / 60).toFixed(2),
+                record.cost.toFixed(2)
+            ]);
+
+            const csvContent = [headers, ...rows]
+                .map(row => row.join(','))
+                .join('\n');
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        function formatDateForFile(date) {
+            return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function clearHistory() {
+            if (history.length === 0) {
+                alert('暂无历史记录可清空');
+                return;
+            }
+
+            if (confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
+                history = [];
+                saveToStorage();
+                loadHistory();
+                updateStats();
+                alert('历史记录已清空');
+            }
+        }
+
+        function resetSystem() {
+            if (confirm('确定要重置系统吗？\n\n这将：\n1. 删除所有桌子\n2. 清空所有历史记录\n3. 恢复默认10个桌子\n\n此操作不可恢复！')) {
+                localStorage.removeItem(STORAGE_KEYS.TABLES);
+                localStorage.removeItem(STORAGE_KEYS.HISTORY);
+                tables = [];
+                history = [];
+                loadFromStorage();
+                renderTables();
+                loadHistory();
+                updateStats();
+                alert('系统已重置，已恢复默认10个桌子');
+            }
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ============ 调试功能 ============
+        function showDebugInfo() {
+            const auth = localStorage.getItem('timer_system_authorized');
+            const tables = localStorage.getItem(STORAGE_KEYS.TABLES);
+            const history = localStorage.getItem(STORAGE_KEYS.HISTORY);
+            const passwordSet = localStorage.getItem(STORAGE_KEYS.PASSWORD_SET);
+
+            let tablesInfo = '无数据';
+            try {
+                const tablesObj = JSON.parse(tables);
+                tablesInfo = `桌子数量: ${tablesObj.length}`;
+            } catch (e) {
+                tablesInfo = '解析失败';
+            }
+
+            let historyInfo = '无数据';
+            try {
+                const historyArr = JSON.parse(history);
+                historyInfo = `记录数量: ${historyArr.length}`;
+            } catch (e) {
+                historyInfo = '解析失败';
+            }
+
+            const debugContent = `
+                <div style="text-align: left; font-size: 14px; line-height: 1.8;">
+                    <div><strong>授权状态：</strong>${auth === 'true' ? '✅ 已授权' : '❌ 未授权'}</div>
+                    <div><strong>密码设置：</strong>${passwordSet === 'true' ? '✅ 已设置' : '❌ 未设置'}</div>
+                    <div><strong>桌子数据：</strong>${tablesInfo}</div>
+                    <div><strong>历史记录：</strong>${historyInfo}</div>
+                    <div style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                        <strong>提示：</strong><br>
+                        如果"未授权"，请重新输入密钥<br>
+                        如果"无数据"，点击下方按钮恢复
+                    </div>
+                </div>
+            `;
+
+            showModal('🔧 系统调试', debugContent, () => {
+                // 重新初始化桌子
+                tables = [];
+                history = [];
+                localStorage.removeItem(STORAGE_KEYS.TABLES);
+                localStorage.removeItem(STORAGE_KEYS.HISTORY);
+                initializeDefaultTables();
+                renderTables();
+                loadHistory();
+                updateStats();
+                closeModal();
+                alert('已重新初始化默认10个桌子');
+            });
+        }
+
+        // ============ 启动 ============
+        // 页面加载完成后检查授权
+        window.onload = checkAuthorization;
+    </script>
+</body>
+</html>
